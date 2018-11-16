@@ -1,0 +1,38 @@
+{% macro list(items, level = 0) %}
+    {% import _self as time_sheet_result_tree %}
+
+    {% set iterator = 0 %}
+    {% for item in items %}
+        {% set iterator = iterator + 1 %}
+        <tr title="{{ item['Info'] }}" data-toggle="tooltip">
+            <td class="pl-{{ level }}" scope="row">
+                {% if level > 0 %}
+                    {% for i in range(0, level) %}
+                        --
+                    {% endfor %}
+                {% endif %}
+
+                {{ iterator }}
+            </td>
+            <td>{{ item['Id'] }}</td>
+            <td>{{ item['Name'] }}</td>
+            <td>{{ item['TotalTimeStr'] }}/{{ item['TotalTimeIncludeSubordinateStr'] }}</td>
+            <td class="{{ item['EmailIsValid'] ?: 'alert-danger' }}" >{{ item['Email'] }}</td>
+
+            {% if item['flawDays'] %}
+                <td class="alert-danger" title="{{ item['flawDaysStr'] }}" data-toggle = "tooltip">Недоработка</td>
+            {% else %}
+                <td></td>
+            {% endif %}
+
+
+        </tr>
+
+        {% if item['Subordinates'] %}
+            {{ time_sheet_result_tree.list(item['Subordinates'], level+1) }}
+        {% endif %}
+    {% endfor %}
+
+{% endmacro %}
+
+
